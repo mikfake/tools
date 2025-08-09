@@ -1,104 +1,121 @@
-  public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        int fatherPos = scanner.nextInt();
-        int martinPos = scanner.nextInt();
-        int velFather = scanner.nextInt();
-        int steps = scanner.nextInt();
+public class MaxFlow {
+    static int minRoutes;
 
-        int maxCommonSteps = 0;
-        int bestVelocity = 1;
+    public static int minimumStraightRoutes(int[][] coordinates) {
+        int n = coordinates.length;
+        
+        if (n == 0) return 0;
+        if (n == 1) return 1;
+        if (n == 2) return 1;
+        
+        List<Set<Integer>> lines = findAllLines(coordinates);
+        
+        minRoutes = n; 
+        boolean[] covered = new boolean[n];
+        findMinCover(lines, covered, 0, 0, n);
 
-        for (int v2 = 1; v2 <= 10000; v2++) {
-            int commonSteps = calculateCommonFootsteps(fatherPos, martinPos, velFather, v2, steps);
-            if (commonSteps > maxCommonSteps ||
-                    (commonSteps == maxCommonSteps && v2 > bestVelocity)) {
-                maxCommonSteps = commonSteps;
-                bestVelocity = v2;
-            }
-        }
-
-        System.out.println(maxCommonSteps + " " + bestVelocity);
-        scanner.close();
+        return minRoutes;
     }
 
-    private static int calculateCommonFootsteps(int fatherPos, int martinPos, int velFather, int velMartin, int totalSteps) {
-        Set<Integer> fatherFootsteps = new HashSet<>();
+    private static List<Set<Integer>> findAllLines(int[][] coords) {
+        int n = coords.length;
+        List<Set<Integer>> lines = new ArrayList<>();
+        Set<String> seen = new HashSet<>();
+        
+        for (int i = 0; i < n; i++) {
+            for (int j = i + 1; j < n; j++) {
+                Set<Integer> line = new HashSet<>();
+                line.add(i);
+                line.add(j);
+                
+                for (int k = 0; k < n; k++) {
+                    if (k != i && k != j && isCollinear(coords[i], coords[j], coords[k])) {
+                        line.add(k);
+                    }
+                }
+                
+                List<Integer> sorted = new ArrayList<>(line);
+                Collections.sort(sorted);
+                String lineId = sorted.toString();
 
-        for (int step = 0; step <= totalSteps; step++) {
-            fatherFootsteps.add(fatherPos + velFather * step);
-        }
-
-        Set<Integer> commonFootsteps = new HashSet<>();
-        int maxStepsNeeded = 10000;
-
-        for (int step = 0; step <= maxStepsNeeded; step++) {
-            int martinCurrentPos = martinPos + velMartin * step;
-            if (fatherFootsteps.contains(martinCurrentPos)) {
-                commonFootsteps.add(martinCurrentPos);
-            }
-        }
-
-        return commonFootsteps.size();
-    }
-
-
-
-
-
-static class Edge {
-            int to, capacity;
-
-            Edge(int to, int capacity) {
-                this.to = to;
-                this.capacity = capacity;
-            }
-        }
-
-        static List<List<Edge>> graph;
-        static boolean[] visited;
-
-        public static void main(String[] args) {
-            Scanner scanner = new Scanner(System.in);
-
-            int num = scanner.nextInt();
-            int baseR = scanner.nextInt();
-            int numCon = scanner.nextInt();
-            int charCon = scanner.nextInt();
-
-            graph = new ArrayList<>();
-            for (int i = 0; i <= num; i++) {
-                graph.add(new ArrayList<>());
-            }
-
-            for (int i = 0; i < numCon; i++) {
-                int start = scanner.nextInt();
-                int end = scanner.nextInt();
-                int rate = scanner.nextInt();
-                graph.get(start).add(new Edge(end, rate));
-                graph.get(end).add(new Edge(start, rate));
-            }
-
-            visited = new boolean[num + 1];
-            int result = calculateMaxFlow(baseR, -1);
-
-            System.out.println(result);
-            scanner.close();
-        }
-
-        static int calculateMaxFlow(int node, int parent) {
-            int totalCapacity = 0;
-
-            for (Edge edge : graph.get(node)) {
-                if (edge.to != parent) {
-                    int subTreeFlow = calculateMaxFlow(edge.to, node);
-
-                    int actualFlow = Math.min(edge.capacity, subTreeFlow);
-                    totalCapacity += actualFlow;
+                if (!seen.contains(lineId)) {
+                    seen.add(lineId);
+                    lines.add(line);
                 }
             }
-
-            if (totalCapacity == 0) {
-                return 1000000;
-            }
-            return totalCapacity;
         }
+        
+        for (int i = 0; i < n; i++) {
+            Set<Integer> single = new HashSet<>();
+            single.add(i);
+            lines.add(single);
+        }
+
+        return lines;
+    }
+
+    private static void findMinCover(List<Set<Integer>> lines, boolean[] covered,
+                                     int lineIndex, int usedLines, int n) {
+        boolean allCovered = true;
+        for (int i = 0; i < n; i++) {
+            if (!covered[i]) {
+                allCovered = false;
+                break;
+            }
+        }
+
+        if (allCovered) {
+            minRoutes = Math.min(minRoutes, usedLines);
+            return;
+        }
+        
+        if (usedLines >= minRoutes) {
+            return;
+        }
+        
+        for (int i = lineIndex; i < lines.size(); i++) {
+            Set<Integer> line = lines.get(i);
+            
+            List<Integer> newlyCovered = new ArrayList<>();
+            for (int point : line) {
+                if (!covered[point]) {
+                    covered[point] = true;
+                    newlyCovered.add(point);
+                }
+            }
+            
+            if (!newlyCovered.isEmpty()) {
+                findMinCover(lines, covered, i + 1, usedLines + 1, n);
+            }
+            
+            for (int point : newlyCovered) {
+                covered[point] = false;
+            }
+        }
+    }
+
+    private static boolean isCollinear(int[] p1, int[] p2, int[] p3) {
+        long dx1 = p2[0] - p1[0];
+        long dy1 = p2[1] - p1[1];
+        long dx2 = p3[0] - p1[0];
+        long dy2 = p3[1] - p1[1];
+
+        return dx1 * dy2 == dx2 * dy1;
+    }
+
+    public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
+
+        int coordinates_row = in.nextInt();
+        int coordinates_col = in.nextInt();
+        int coordinates[][] = new int[coordinates_row][coordinates_col];
+        for(int idx = 0; idx < coordinates_row; idx++) {
+            for(int jdx = 0; jdx < coordinates_col; jdx++) {
+                coordinates[idx][jdx] = in.nextInt();
+            }
+        }
+
+        int result = minimumStraightRoutes(coordinates);
+        System.out.print(result);
+    }
+}
