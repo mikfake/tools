@@ -1,16 +1,29 @@
-Question
-Theon is an energy engineer. His job is to transport oil from the base refinery to the main storage unitsthrough a network of pipes. The network is in the form of a tree, where the base refinery is the root andthe main storage units are the leaves, The pipes are connected to the storage units via internalconnecting, stations. The pipes can have different transfer rates fliter of oil per unit of timej. He wishes todetermine the maximum amount of oll that can be transported via the network at any
-Write an algorithm to help Theon find the maximum amount of oil that can be transported via thenetwork at any given time.
-input
-The first line of the input consists of an integer . num, representing the number of stations in the network
-(N).
-The second line consists of an integer - baseR, representing the index of the base refinery in the network
-(S).
-The third line consists of two space-separated integers - numCon and charCon, representing the numberof connections in the network (numCon (M) is always equal to N-1) and given characteristics of eachconnection (charCon (P) is always equal to 3), respectively.The next M lines consist of p space-separated integers - start endand rate, representing the startingnode of the pipe; the ending node of the pipe; and the transfer rate of the pipe, respectively.
-OutputPrint an integer representing, the maximum amount of olil that can be transported vla the network at anygiven time.
+version of JDK being used is 1.8
+
+Note: The main class name must be "Solution".
+
+Martin's father goes for a jog every morning. Martin follows him several minutes later. His father starts at a position that is X1 meters away from their home and runs rectilinearly at a constant speed of V1 meters per step for N steps.
+
+Martin is standing at X2 meters away from his home. He wonders how fast he must run at some constant speed of V2 meters per step so as to maximize F, where F equals the number of his father's footsteps that Martin will land on during his run. It is given that the first step that Martin will land on, from his starting position, will have been landed on by his father.
+
+Note that if more than one prospective velocity results in the same number of maximum common steps, output the highest prospective velocity as V2.
+
+Write an algorithm to help Martin calculate F and V2.
+
+Input
+The first line of the input consists of an integer fatherPos, representing the initial position of Martin's father (X₁).
+The second line consists of an integer martinPos, representing the initial position of Martin (X₂).
+The third line consists of an integer velFather, representing the velocity of the father (V₁).
+The last line consists of an integer steps, representing the number of steps taken by the father (N).
+
+Output
+Print two space-separated integers as the maximum number of common footsteps F and respective speed V₂.
+
 Constraints
-3 s num s 105
-1's baseRs 105
-1 srates103
-numConenum-1
-charCon =3
+1 ≤ fatherPos ≤ 10⁵
+0 ≤ martinPos ≤ fatherPos
+1 ≤ velFather ≤ 10⁴
+1 ≤ steps ≤ 10⁴
+
+Example
+Input: （因截图中示例输入显示不全，按已有提取 ）
